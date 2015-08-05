@@ -161,7 +161,7 @@ if(in_array(30, $user->groups)){?>
 
 ?>
 
-<video id=example-video" width=600 height=300 class="video-js vjs-default-skin" controls>
+<video id=example-video width=600 height=300 class="video-js vjs-default-skin" controls>
   <source
      src="https://d3o44rpd4mon6c.cloudfront.net/movies/Amazing%20Love:%20The%20Story%20of%20Hosea%20(2012)/playlist.m3u8"
      type="application/x-mpegURL">
