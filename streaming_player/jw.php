@@ -3,8 +3,9 @@
 
 require_once "jw_api.php";
 require_once "extra_fields.php";
+require_once "source_tools.php";
 
-
+$document = JFactory::getDocument();
 $k2_id = JRequest::getVar('k2_id');
 $user = JFactory::getUser();
 $db = JFactory::getDbo();
@@ -18,27 +19,30 @@ $db->setQuery($query);
 $title = $db->loadResult();
 
 $stream_key = get_extra_field($k2_id,52);
-$api = new BotrAPI('jnpXvn03','qyQRztWpgIto2ZLzpR3Mq44J');
-$props = array(
-	"player_key"			=> "iXJDhjmf",
-	"custom.abouttext"		=> "testing",
-	"sharing_player_key"	=> "iXJDhjmf",
-	"allowscriptaccess"		=> "always",
-	"displaytitle"			=> "true"
 
-);
-$response = $api->call("/players/update", $props);
-//print_r($response);
-//echo "hello world";
+if(!in_array(30, $user->groups)){
 
-function get_signed_player($videokey,$playerkey) {
-  $path = "players/".$videokey."-".$playerkey.".js";
-  $expires = round((time()+3600)/60)*60;
-  $secret = "qyQRztWpgIto2ZLzpR3Mq44J";
-  $signature = md5($path.':'.$expires.':'.$secret);
-  $url = 'http://streaming.morningstarvideo.com/'.$path.'?exp='.$expires.'&sig='.$signature;
-  return $url;
-};
+	$api = new BotrAPI('jnpXvn03','qyQRztWpgIto2ZLzpR3Mq44J');
+	$props = array(
+		"player_key"			=> "iXJDhjmf",
+		"custom.abouttext"		=> "testing",
+		"sharing_player_key"	=> "iXJDhjmf",
+		"allowscriptaccess"		=> "always",
+		"displaytitle"			=> "true"
+
+	);
+	$response = $api->call("/players/update", $props);
+	//print_r($response);
+	//echo "hello world";
+
+	function get_signed_player($videokey,$playerkey) {
+ 	 	$path = "players/".$videokey."-".$playerkey.".js";
+  		$expires = round((time()+3600)/60)*60;
+  		$secret = "qyQRztWpgIto2ZLzpR3Mq44J";
+  		$signature = md5($path.':'.$expires.':'.$secret);
+  		$url = 'http://streaming.morningstarvideo.com/'.$path.'?exp='.$expires.'&sig='.$signature;
+  		return $url;
+	};
 
 ?>
 <div style="color:white;font-size:20px;margin-bottom:25px;">
@@ -68,9 +72,7 @@ echo "<script type='text/javascript' src='".get_signed_player($stream_key,'P80a0
 
 <?
 
-$groups = JAccess::getGroupsByUser($user->id);
-
-if(in_array(30, $groups)){?>
+if(in_array(30, $user->groups)){?>
 	
 <script type="text/javascript">
 
@@ -147,4 +149,31 @@ if(in_array(30, $groups)){?>
 	
 </script>	
 
-<?}?>
+<?}} else {
+
+
+	$document->addStyleSheet('//vjs.zencdn.net/4.12/video-js.css');
+	$document->addScript('//vjs.zencdn.net/4.12/video.js');
+	$document->addScript('videojs-media-sources/videojs-media-sources.js');
+	$document->addScript('videojs-contrib-hls/videojs-hls.js');
+
+
+
+?>
+
+<video id=example-video" width=600 height=300 class="video-js vjs-default-skin" controls>
+  <source
+     src="https://d3o44rpd4mon6c.cloudfront.net/movies/Amazing%20Love:%20The%20Story%20of%20Hosea%20(2012)/playlist.m3u8"
+     type="application/x-mpegURL">
+</video>
+<script src="video.js"></script>
+<script src="videojs-media-sources.js"></script>
+<script src="videojs-hls.min.js"></script>
+<script>
+var player = videojs('example-video');
+player.play();
+</script>
+
+<?
+}
+?>
