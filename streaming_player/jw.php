@@ -182,7 +182,7 @@ player.play();
 ?>
 <script type="text/javascript">
 
-player.ready(function{
+player.ready(function(){
 
 		
 	var player = this;
