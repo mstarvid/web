@@ -1464,5 +1464,177 @@ function print_errors($errors){
 
 }
 
+
+// ------------------------------------------------------------------------------------
+// ************************************************************************************
+// ------------------------------------------------------------------------------------
+
+function get_movie_object($id){
+
+	$db = JFactory::getDBO();
+	$q = "SELECT * FROM source WHERE k2ID='{$id}' limit 1";
+	$db->setQuery($q);
+	$movie = $db->loadObject();
+
+	$base_url = JURI::base();
+
+	$path = $movie->roku_category;
+
+	$query = $db->getQuery(true);
+	$query->select('name');
+	$query->from($db->quoteName('xlefz_k2_categories'));
+	$query->join('INNER',$db->quoteName('xlefz_k2_items') . ' ON (' . $db->quoteName('xlefz_k2_items.catid') . ' = ' . $db->quoteName('xlefz_k2_categories.id') . ')' );
+	$query->where($db->quoteName('xlefz_k2_items.id')." = ".$db->quote($id));
+ 
+	// Reset the query using our newly populated query object.
+	$db->setQuery($query);
+	$category = $db->loadResult();
+
+	jimport('joomla.filesystem.file');
+	$clean_filename = JFile::makeSafe( $movie->title );
+	$clean_filename_nospace = str_replace(" ", "%20", $clean_filename);
+	$title_nospace = str_replace(" ", "%20", $movie->title);
+
+	$fulltext = $movie->synopsis;
+	$introtext = str_replace("<p>", "", $fulltext);
+	$introtext = str_replace("</p>", "", $introtext);
+	//$introtext = substr($introtext, 0, 250);
+
+	if($movie->is_tv == "yes"){
+		$content_type = "TV";
+	}elseif($movie->is_tv == "no"){
+		$content_type = "Movie";
+	}
+
+	if($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/cdrama/"){
+		//christian drama
+		$year = $movie->year;
+		// old stream path $stream_path = "movies/{$clean_filename} ({$year})";
+		$stream_path = "movies/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/cdrama/validate/";
+		$img_path = "/";
+	}elseif($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/TV/7th_street_theater/"){
+		//7th street theater
+		$parameters = substr ( $movie->title , 0 , 8 );
+		$season = substr( $parameters, 0, 3 );
+		$episode = substr( $parameters, 4, 8 );
+
+		$stream_path = "TV/7th_street_theater/{$season}/{$episode}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/TV/7th_street_theater/".$season."/validate/";
+		$img_path = "/7th_street_theater/";
+
+	}elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/TV/Genesis_7/") {
+		//Genesis 7
+		$parameters = substr ( $movie->title , 0 , 8 );
+		$season = substr( $parameters, 0, 3 );
+		$episode = substr( $parameters, 4, 8 );
+		echo $season."<br>".$episode;
+		$stream_path = "TV/genesis_7/{$season}/{$episode}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/TV/Genesis_7/".$season."/validate/";
+		echo $xml_path;
+		$img_path = "/Genesis_7/";
+	}elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/american_heritage_collection/") {
+		//
+		
+		$stream_path = "edu/american_heritage_collection/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/american_heritage_collection/validate/";
+		$img_path = "/american_heritage_collection/";
+	}elseif($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/animated/"){
+		//Action
+		$year = $movie->year;
+		
+		$stream_path = "movies/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/animated/validate/";
+		$img_path = "/";
+	}
+	elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/science/") {
+		//
+		
+		$stream_path = "edu/science/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/science/validate/";
+		$img_path = "/";
+	}elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/documentaries/") {
+		//
+		
+		$stream_path = "edu/science/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/documentaries/validate/";
+		$img_path = "/";
+	}elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/documentaries/") {
+		//
+		
+		$stream_path = "edu/science/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/documentaries/validate/";
+		$img_path = "/";
+	}elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/history/") {
+		//
+		
+		$stream_path = "edu/history/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/history/validate/";
+		$img_path = "/";
+	}elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/mikes_inspiration_station/") {
+		//
+		
+		$stream_path = "edu/mikes_inspiration_station/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/edu/mikes_inspiration_station/validate/";
+		$img_path = "/";
+	}elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/misc/") {
+		//
+		
+		$stream_path = "misc/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/misc/validate/";
+		$img_path = "/";
+	}elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/sci-fi/") {
+		//
+		
+		$stream_path = "movies/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/sci-fi/validate/";
+		$img_path = "/";
+	}elseif ($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/romance/") {
+		//
+		
+		$stream_path = "movies/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/romance/validate/";
+		$img_path = "/";
+	}elseif($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/short/"){
+		//
+		$year = $movie->year;
+		$stream_path = "movies/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/short/validate/";
+		$img_path = "/";
+	}elseif($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/picks/"){
+		//picks
+		$year = $movie->year;
+		$stream_path = "movies/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/picks/";
+		$img_path = "/";
+	}elseif($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/trailers/"){
+		//trailers
+		$year = $movie->year;
+		$stream_path = "movies/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/trailers/";
+		$img_path = "/";
+	}elseif($movie->roku_category == "/roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/action/"){
+		//
+		$year = $movie->year;
+		// old stream path $stream_path = "movies/{$clean_filename} ({$year})";
+		$stream_path = "movies/{$title_nospace}";
+		$xml_path = "roku_Kqx4sQxJ9RHzKXq7x68wSYEA/xml/categories/action/validate/";
+		$img_path = "/";
+	}
+
+	$runtime = $movie->runtime * 60;
+
+	$category = 0;
+
+	$moovie = new stdObject();
+	$moovie->runtime = $runtime;
+	$moovie->card_img = "http://mstarvid.com/images/_virtuemart_product{$img_path}{$clean_filename_nospace}hd.jpg"; 
+	$moovie->description = $introtext;
+	$moovie->category = $category;
+	$moovie->stream_url = "https://d3o44rpd4mon6c.cloudfront.net/{$stream_path}/playlist.m3u8";  
+
+
+}
+
 ?>
 
