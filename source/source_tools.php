@@ -1626,7 +1626,7 @@ function get_movie_object($id){
 
 	$category = 0;
 
-	$moovie = new stdObject();
+	$moovie = new stdClass();
 	$moovie->runtime = $runtime;
 	$moovie->card_img = "http://mstarvid.com/images/_virtuemart_product{$img_path}{$clean_filename_nospace}hd.jpg"; 
 	$moovie->description = $introtext;
