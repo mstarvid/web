@@ -1633,7 +1633,7 @@ function get_movie_object($id){
 	$moovie->category = $category;
 	$moovie->stream_url = "https://d3o44rpd4mon6c.cloudfront.net/{$stream_path}/playlist.m3u8";  
 
-	return $movie;
+	return $moovie;
 
 }
 
