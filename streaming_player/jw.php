@@ -180,3 +180,90 @@ player.play();
 <?
 }
 ?>
+<script type="text/javascript">
+
+player.ready(function{
+
+		
+	var player = this;
+	var next_call 			= 0;
+	var clock 				= 0;
+	var delta 				= 0;
+	var report_time			= 0;
+	var playbackPaused		= false;
+	var playbackStopped		= false;
+	var begin				= false;
+
+	player.on('pause',function(){
+		
+		playbackPaused = true;
+
+	});	
+
+//	jwplayer().onIdle(function(){
+		
+//		playbackStopped = true;
+
+//	});	
+
+//	jwplayer().onPlay(function(){
+		
+//		if(begin && playbackPaused){
+
+//			playbackPaused = false;
+//			clock = 0;
+//			next_call = clock + 1000;
+
+//		}	
+
+//	});	
+
+	player.on("play",function(){
+
+		if(begin && playbackPaused){
+
+			playbackPaused = false;
+			clock = 0;
+			next_call = clock + 1000;
+		}
+	
+		if(!begin){
+
+			begin = true;
+
+			setInterval(function () {clock = clock + 10;}, 10);
+			
+			next_call = clock + 1000;
+
+			(function poll(){
+			   setTimeout(function(){
+
+			   		if(clock > next_call && !playbackStopped && !playbackPaused){	
+
+			   			delta = clock - next_call;
+
+			   			report_time = delta + 1000;
+
+			   			next_call = clock + 1000;
+
+						jQuery.ajax({ url: "roku_movie_view.php?k2_id=<? echo $k2_id; ?>&time_viewed="+report_time+"&mode=k2", success: function(data){
+						//alert(report_time);	
+						poll();
+						}, dataType: "text", cache: false}); 
+
+				    }else{
+
+				    	poll();
+
+				    }  
+				 
+			  }, 100);
+			})();
+
+		}	
+
+	});
+	
+});
+</script>	
+
