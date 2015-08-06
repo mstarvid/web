@@ -155,20 +155,23 @@ if(in_array(30, $user->groups)){?>
 	$document->addStyleSheet('//vjs.zencdn.net/4.12/video-js.css');
 	$document->addScript('//vjs.zencdn.net/4.12/video.js');
 	$document->addScript('videojs-media-sources/videojs-media-sources.js');
-	$document->addScript('videojs-contrib-hls/videojs-hls.js');
+	$document->addScript('https://github.com/videojs/videojs-contrib-hls/releases/download/v0.17.1/videojs.hls.min.js');
+	$movie = get_movie_object($k2_id);
 
-
+	//echo $movie->stream_url;
+	//print_r($movie);
+	//echo "hello world";
 
 ?>
 
 <video id=example-video width=600 height=300 class="video-js vjs-default-skin" controls>
   <source
-     src="https://d3o44rpd4mon6c.cloudfront.net/movies/Amazing%20Love:%20The%20Story%20of%20Hosea%20(2012)/playlist.m3u8"
+     src="<? echo $movie->stream_url; ?>"
      type="application/x-mpegURL">
 </video>
-<script src="video.js"></script>
-<script src="videojs-media-sources.js"></script>
-<script src="videojs-hls.min.js"></script>
+<!--<script src="//vjs.zencdn.net/4.12/video.js"></script>-->
+<!--<script src="videojs-media-sources/videojs-media-sources.js"></script>-->
+<!--<script src="videojs-contrib-hls/videojs-hls.js"></script>-->
 <script>
 var player = videojs('example-video');
 player.play();
